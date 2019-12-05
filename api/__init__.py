@@ -1,5 +1,6 @@
-from flask import Flask
+from flask import Flask, jsonify
 from flask_sockets import Sockets
+import packagestore
 
 app = Flask(__name__)
 sockets = Sockets(app)
@@ -12,17 +13,35 @@ def hello_world():
 
 @app.route('/api/package', methods=['POST'])
 def upload_package():
-    pass
+    #Store the file
+    packagename = ""
+    packagepath = ""
+    packagestore.put(packagename, packagepath)
+    #Broadcast to all connected sockets that we have an event
+    # { type : "update_push" }
 
 
 @app.route('/api/<package>/version', methods=['GET'])
 def version_check(package):
-    return ""
+    from pyaxmlparser import APK
+    if not packagestore.has(package):
+        return ""
+    path = packagestore.get(package)
+    apk = APK(path)
+    print(apk.package)
+    print(apk.version_name)
+    print(apk.version_code)
+    print(apk.icon_info)
+    print(apk.icon_data)
+    print(apk.application)
+    return jsonify({'version': apk.version_name})
 
 
 @app.route('/api/<package>', methods=['GET'])
 def get_package(package):
-    pass
+    file = packagestore.get(package)
+    #return the file
+    return file
 
 
 @sockets.route('/ws')
@@ -34,6 +53,7 @@ def handle_message(ws):
             continue
         else:
             ws.send("{ \"type\": \"ping\"}")
+
 
 
 # ws - push update checks

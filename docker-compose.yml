@@ -17,6 +17,8 @@ services:
     #  - ./api:/app
       - db:/app/db
       - ./packages:/app/packages
+    ports:
+      - 8006:5000
 
     
   ui:
