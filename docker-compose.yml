@@ -1,0 +1,33 @@
+version: "3"
+
+#networks:
+#  esnet:
+
+volumes:
+  db:
+
+services:
+
+  api:
+    build:
+      context: "./api"
+    image: registry.netlyt.io:5000/netlyt/cruzrdeploy
+    container_name: cruzrdeploy
+    volumes:
+    #  - ./api:/app
+      - db:/app/db
+      - ./packages:/app/packages
+
+    
+  ui:
+    build:
+      context: "./webui"
+    image: registry.netlyt.io:5000/netlyt/cruzrdeploy_ui
+    container_name: cruzrdeploy_ui
+    ports:
+      - 8005:80
+    volumes:
+    #  - ./webui/build:/usr/share/nginx/html
+      - ./conf/site.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - api

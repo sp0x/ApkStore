@@ -1,0 +1,126 @@
+version: 0.4
+
+#The environment vars you'll use
+env:
+  NAME: cruzrdeploy
+  SERVICE_NAME: ui
+  IMAGE: netlyt/cruzrdeploy
+  DIR: /var/netlyt/environments/$IMAGE
+  REGISTRY: registry.netlyt.io:5000
+  HOST_PORT: 8005
+  USER: vasko
+
+networks:
+  # The staging directory
+  staging:
+    hosts:
+      - ibm.netlyt.io
+
+commands:
+  #These commands are just helpers, don't modify them
+  prepare:
+    desc: Build the docker images locally
+    local: docker-compose build
+
+  post-upload:
+    desc: Fixes file permission and ownership after uploading
+    run: sudo chmod 775 -R $DIR; sudo chown $USER:netlyt -R $DIR
+
+  push-local:
+    desc: Pushes the service
+    local: docker-compose push
+
+  pre-build:
+    desc: Initialize directory
+    run: mkdir -p $DIR; mkdir -p $DIR/api; mkdir -p $DIR/webui
+
+  upload:
+    desc: Build Docker image from current directory, push to Docker Hub
+    # local: sup $SUP_ENV -f ./builder/Supfile $SUP_NETWORK build
+    upload:
+      - src: docker-compose.yml
+        dst: $DIR
+      - src: conf
+        dst: $DIR
+#      - src: api/topics_storage
+#        dst: $DIR
+
+  pull:
+    desc: Pull latest Docker image
+    run: sudo docker-compose pull
+    chdir: $DIR
+
+  stop:
+    desc: Stop Docker container
+    run: sudo docker-compose stop $SERVICE_NAME || exit 0
+    chdir: $DIR
+
+  rm:
+    desc: Remove Docker container
+    run: sudo docker-compose rm -f $SERVICE_NAME || exit 0
+    chdir: $DIR
+
+  start:
+    desc: Start a stopped Docker container
+    run: sudo docker-compose start $SERVICE_NAME || exit 0
+    chdir: $DIR
+
+  run:
+    desc: Run Docker container
+    run: sudo docker-compose up -d $SERVICE_NAME
+    chdir: $DIR
+
+
+  restart:
+    desc: Restart Docker container
+    run: sudo docker-compose restart $SERVICE_NAME || exit 0
+    chdir: $DIR
+
+  stop-rm-run:
+    desc: Rolling update (stop & remove old Docker container, run new one)
+    run: sudo docker-compose stop $SERVICE_NAME; sudo docker-compose rm -f $SERVICE_NAME; sudo docker-compose up -d $SERVICE_NAME
+    serial: 1
+    chdir: $DIR
+
+  ps:
+    desc: List running Docker containers
+    run: sudo docker-compose ps
+    chdir: $DIR
+
+  logs:
+    desc: Docker logs
+    run: sudo docker-compose logs $SERVICE_NAME
+    chdir: $DIR
+
+  tail-logs:
+    desc: Tail Docker logs
+    run: sudo docker-compose logs -f $SERVICE_NAME
+    chdir: $DIR
+
+  health:
+    desc: Application health check
+    run: curl localhost:$HOST_PORT
+
+  slack-notify:
+    desc: Notify Slack about new deployment
+    local: >
+      curl -X POST --data-urlencode 'payload={"channel": "#dev", "text": "['$SUP_NETWORK'] '$SUP_USER' deployed '$NAME'"}' \
+        https://hooks.slack.com/services/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
+
+
+targets:
+  #The deployment target command, it runs multiple commands one after another, ensuring the previous one returned 0
+  deploy:
+    - pre-build
+    - prepare
+    - push-local
+    - pre-build
+    - post-upload
+    - upload
+    - post-upload
+    - pull
+    - stop-rm-run
+    - ps
+    - logs
+    - health
+    - slack-notify

@@ -1,0 +1,6 @@
+venv
+.idea
+/model
+.vscode
+__pycache__
+/import.csv

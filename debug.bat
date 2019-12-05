@@ -1,0 +1,1 @@
+docker run -it -v /d/dev/python/electronics_store/api:/app --entrypoint=bash -p 81:8123 -e ES_HOST=10.10.1.7 registry.netlyt.io:5000/netlyt/electronics_store:latest
