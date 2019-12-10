@@ -7,10 +7,10 @@ import packagestore
 
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
-app.config['SECRET_KEY'] = 'secret!'
+# app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app)
 ALLOWED_EXTENSIONS = ["apk"]
-
+EV_PACKAGE_PUSHED = "update_push"
 
 @app.route('/')
 def hello_world():
@@ -30,7 +30,7 @@ def broadcast_creation(pkginfo):
         "version": pkginfo["version"],
         "ev": ev
     }
-    socketio.emit("update_push", payload, broadcast=True)
+    socketio.emit(EV_PACKAGE_PUSHED, payload, broadcast=True)
 
 
 @app.route('/api/package', methods=['POST'])
