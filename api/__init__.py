@@ -4,6 +4,8 @@ from flask_socketio import SocketIO
 import os
 from flask_cors import CORS
 import packagestore
+import models
+import appstore
 
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
@@ -11,6 +13,7 @@ CORS(app, supports_credentials=True)
 socketio = SocketIO(app)
 ALLOWED_EXTENSIONS = ["apk"]
 EV_PACKAGE_PUSHED = "update_push"
+EV_APP_STARTED = "appStarted"
 
 
 @app.route('/')
@@ -75,6 +78,19 @@ def handle_message(message):
 @socketio.on("connected")
 def handle_connection(c):
     print(c)
+
+
+@socketio.on(EV_APP_STARTED)
+def handle_robot_app_start(json):
+    pkg = json["package"]
+    ver = json["version"]
+    serial = json["serial"]
+    imei = json["imei"]
+    wifi_mac = json["wifi_mac"]
+    ext_ip = json["ext_ip"]
+    print('received json: ' + str(json))
+    dev = models.Device(serial=serial, imei=imei, wifi_mac=wifi_mac, ext_ip=ext_ip)
+    appstore.notice_device_app(dev, pkg, ver)
 
 
 @socketio.on('json')

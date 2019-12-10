@@ -22,4 +22,17 @@ class Package(BaseModel):
     file = CharField(null=True)
 
 
-db.create_tables([Package])
+class Device(BaseModel):
+    serial = CharField(unique=True)
+    wifi_mac = CharField(null=True)
+    imei = CharField(null=True)
+    ext_ip = CharField(null=True)
+
+
+class DevicePackage(BaseModel):
+    device = ForeignKeyField(Device, backref='device_packages')
+    package = ForeignKeyField(Package, backref='device_packages')
+    version = CharField()
+
+
+db.create_tables([Package, Device, DevicePackage])
