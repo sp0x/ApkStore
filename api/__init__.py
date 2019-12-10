@@ -113,5 +113,5 @@ def handle_json(json):
 
 if __name__ == '__main__':
     dev = models.Device(serial="ser1", imei="im1", wifi_mac="wifi_mac", ext_ip="ext_ip")
-    #appstore.notice_device_app(dev, "com.netlyt.cruzrdb", "1.1.0")
+    # appstore.notice_device_app(dev, "com.netlyt.cruzrdb", "1.1.0")
     socketio.run(app, host="0.0.0.0", port=5000)

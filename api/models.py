@@ -30,8 +30,8 @@ class Device(BaseModel):
 
 
 class DevicePackage(BaseModel):
-    device = ForeignKeyField(Device, backref='device_packages')
-    package = ForeignKeyField(Package, backref='device_packages')
+    device = ForeignKeyField(Device, backref='devicepackage')
+    package = ForeignKeyField(Package, backref='devicepackage')
     version = CharField()
 
 
