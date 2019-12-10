@@ -2,3 +2,4 @@ flask
 flask_sockets
 Flask_Cors==3.0.8
 pyaxmlparser
+peewee
