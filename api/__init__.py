@@ -3,6 +3,7 @@ from werkzeug.utils import secure_filename
 from flask_socketio import SocketIO
 import os
 from flask_cors import CORS
+from json import loads
 import packagestore
 import models
 import appstore
@@ -82,13 +83,14 @@ def handle_connection(c):
 
 @socketio.on(EV_APP_STARTED)
 def handle_robot_app_start(json):
+    print('received json: ' + str(json))
+    json = loads(json)
     pkg = json["package"]
     ver = json["version"]
     serial = json["serial"]
     imei = json["imei"]
     wifi_mac = json["wifi_mac"]
     ext_ip = json["ext_ip"]
-    print('received json: ' + str(json))
     dev = models.Device(serial=serial, imei=imei, wifi_mac=wifi_mac, ext_ip=ext_ip)
     appstore.notice_device_app(dev, pkg, ver)
 
