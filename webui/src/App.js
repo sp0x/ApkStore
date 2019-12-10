@@ -11,8 +11,9 @@ class App extends Component {
         super(props);
         this.handleDrop = this.handleDrop.bind(this);
         this.state = {
-            predicting: false,
-            file: null
+            uploading: false,
+            file: null,
+            message: null
         }
     }
 
@@ -20,27 +21,26 @@ class App extends Component {
         if (files.length == 0) return;
         this.setState({
             file: files[0],
-            predicting: true
+            uploading: true
         }, () => {
             const data = new FormData();
             data.append('file', files[0]);
-            apiService.post("/api/forecast_file", data, {
+            apiService.post("/api/package", data, {
                 asForm: true
-            }).then(r => r.blob())
-                .then(b => {
-                    const url = window.URL.createObjectURL(new Blob([b]))
-                    const link = document.createElement("a");
-                    link.href = url;
-                    link.setAttribute('download', 'prediction.csv');
-                    document.body.appendChild(link)
-                    link.click();
-                    link.parentNode.removeChild(link)
+            }).then(r => r.json())
+                .then(r => {
+                    let message = `Package ${r.pkginfo.package}==${r.pkginfo.version} was uploaded`;
                     this.setState({
-                        predicting: false
+                        message: message,
+                        uploading: false
+                    }, ()=>{
+                        setTimeout(()=>{
+                            this.setState({message: null, uploading: false})
+                        }, 1000 * 10);
                     })
                 })
                 .catch(e => {
-                    console.log("Error ocurred!");
+                    console.log("Error ocurred!", e);
                 })
         });
 
@@ -60,13 +60,17 @@ class App extends Component {
                             display: 'inline-block'
                         }}>
                             {(() => {
-                                if (this.state.predicting) {
+                                if (this.state.uploading) {
                                     return (<p>
-                                        Please wait for your prediction file...
+                                        Your package is uploading
                                     </p>)
-                                } else {
+                                } else if(this.state.message){
                                     return (<p>
-                                        Drop your CSV here to get predictions
+                                        {this.state.message}
+                                    </p>)
+                                }else {
+                                    return (<p>
+                                        Drop your signed APK.
                                     </p>)
                                 }
 

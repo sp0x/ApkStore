@@ -1,9 +1,16 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request, abort
+from werkzeug.utils import secure_filename
 from flask_sockets import Sockets
+import os
+from flask_cors import CORS
+
 import packagestore
 
+
 app = Flask(__name__)
+CORS(app, supports_credentials=True)
 sockets = Sockets(app)
+ALLOWED_EXTENSIONS = ["apk"]
 
 
 @app.route('/')
@@ -11,13 +18,24 @@ def hello_world():
     return 'Hello World!'
 
 
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
 @app.route('/api/package', methods=['POST'])
 def upload_package():
-    #Store the file
-    packagename = ""
-    packagepath = ""
-    packagestore.put(packagename, packagepath)
-    #Broadcast to all connected sockets that we have an event
+    if 'file' not in request.files:
+        return abort(404)
+    file = request.files['file']
+    if file.filename == '' or not allowed_file(file.filename):
+        return abort(404)
+    pkginfo = packagestore.put(file)
+    return jsonify({
+        "success": True,
+        "pkginfo": pkginfo
+    })
+    # Broadcast to all connected sockets that we have an event
     # { type : "update_push" }
 
 
@@ -40,7 +58,7 @@ def version_check(package):
 @app.route('/api/<package>', methods=['GET'])
 def get_package(package):
     file = packagestore.get(package)
-    #return the file
+    # return the file
     return file
 
 
@@ -53,7 +71,6 @@ def handle_message(ws):
             continue
         else:
             ws.send("{ \"type\": \"ping\"}")
-
 
 
 # ws - push update checks

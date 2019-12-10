@@ -4,8 +4,12 @@ export const apiService = {
     del
 };
 
-let API_ADDR = "vaskovasilev.eu:5001/";
-API_ADDR = "/";
+let API_ADDR = "/";
+if(window && window.location && window.location.href.indexOf("localhost:")!=-1){
+    //Uncomment this if you're testing
+    API_ADDR = "localhost:8006/";
+}
+
 //Uncomment this if you're testing
 //API_ADDR = "vaskovasilev.eu:81/";
 function getUrl(route){
