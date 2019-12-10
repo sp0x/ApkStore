@@ -12,6 +12,7 @@ socketio = SocketIO(app)
 ALLOWED_EXTENSIONS = ["apk"]
 EV_PACKAGE_PUSHED = "update_push"
 
+
 @app.route('/')
 def hello_world():
     return 'Hello World!'
@@ -69,6 +70,11 @@ def get_package(package):
 @socketio.on('message')
 def handle_message(message):
     print('received message: ' + message)
+
+
+@socketio.on("connected")
+def handle_connection(c):
+    print(c)
 
 
 @socketio.on('json')
