@@ -1,5 +1,5 @@
 flask
-flask_sockets
+flask-socketio
 Flask_Cors==3.0.8
 pyaxmlparser
 peewee

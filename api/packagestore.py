@@ -20,8 +20,14 @@ def has(pkgname) -> Optional[Package]:
     return None if len(matching_packages)==0 else matching_packages[0]
 
 
-def get(package):
-    return None
+def get(pkgname):
+    """
+
+    :param pkgname:
+    :return: The filepath for the package.
+    """
+    matching_packages = (Package.select().where(Package.name == pkgname))
+    return None if len(matching_packages) == 0 else matching_packages[0].path
 
 
 def get_apkinfo(filepath):
