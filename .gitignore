@@ -4,3 +4,5 @@ venv
 .vscode
 __pycache__
 /import.csv
+*.sqlite
+*.apk
