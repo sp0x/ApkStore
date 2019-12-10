@@ -94,7 +94,7 @@ def handle_robot_app_start(json):
     serial = json["serial"]
     imei = json.get("imei")
     wifi_mac = json.get("wifi_mac")
-    ext_ip = json["ext_ip"]
+    ext_ip = json.get("ext_ip")
     dev = models.Device(serial=serial, imei=imei, wifi_mac=wifi_mac, ext_ip=ext_ip)
     appstore.notice_device_app(dev, pkg, ver)
 
