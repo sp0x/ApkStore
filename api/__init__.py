@@ -6,7 +6,10 @@ from flask_cors import CORS
 from json import loads
 import packagestore
 import models
+import logging
 import appstore
+
+logging.basicConfig(level=logging.WARNING)
 
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
@@ -84,12 +87,13 @@ def handle_connection(c):
 @socketio.on(EV_APP_STARTED)
 def handle_robot_app_start(json):
     print('received json: ' + str(json))
+    logging.warning(json)
     json = loads(json)
     pkg = json["package"]
     ver = json["version"]
     serial = json["serial"]
-    imei = json["imei"]
-    wifi_mac = json["wifi_mac"]
+    imei = json.get("imei")
+    wifi_mac = json.get("wifi_mac")
     ext_ip = json["ext_ip"]
     dev = models.Device(serial=serial, imei=imei, wifi_mac=wifi_mac, ext_ip=ext_ip)
     appstore.notice_device_app(dev, pkg, ver)
