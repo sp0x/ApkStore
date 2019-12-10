@@ -1,5 +1,5 @@
 from models import Package, Device, DevicePackage
-
+import logging
 
 def notice_device_app(dev: Device, pkg, ver):
     matching_devs = (Device.select().where(Device.serial == dev.serial))
@@ -14,12 +14,15 @@ def notice_device_app(dev: Device, pkg, ver):
         match.ext_ip = dev.ext_ip
         match.update()
         dev = match
-    pkgs = Package.select().where(Package.name == pkg)
+    pkgs = (Package.select().where(Package.name == pkg))
     if len(pkgs) == 0:
+        logging.warning("Adding device with new package: " + pkg)
         package = Package()
         package.name = pkg
         package.version = ver
+        package.save()
     else:
         package = pkgs[0]
+        logging.warning("Adding device with existing package: " + pkg)
     DevicePackage.create(device=dev, package=package)
     return dev
