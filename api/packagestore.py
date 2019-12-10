@@ -4,13 +4,18 @@ import shutil
 from werkzeug.utils import secure_filename
 import models
 from models import Package
-from sqlite_orm.database import Database
-
+from typing import Optional
 PACKAGE_DIR = "/app/packages"
 
 
-def has(package):
-    return None
+def has(pkgname) -> Optional[Package]:
+    """
+
+    :param pkgname:
+    :return: The matching package, None if not found.
+    """
+    matching_packages = (Package.select().where(Package.name == pkgname))
+    return None if len(matching_packages)==0 else matching_packages[0]
 
 
 def get(package):
@@ -25,6 +30,13 @@ def get_apkinfo(filepath):
 
 
 def __store_package_info(pkgname, version, path):
+    """
+
+    :param pkgname:
+    :param version:
+    :param path:
+    :return: True or False if the package is new or not
+    """
     new_pkg = Package()
     new_pkg.version = version
     new_pkg.name = pkgname
@@ -32,10 +44,12 @@ def __store_package_info(pkgname, version, path):
     matching_packages = (Package.select().where(Package.name == pkgname))
     if len(matching_packages) == 0:
         new_pkg.save()
+        return True
     else:
         q = Package.delete().where(Package.name == pkgname)
         q.execute()
         new_pkg.save()
+        return False
 
 
 def put(file):
@@ -47,7 +61,7 @@ def put(file):
     filename = secure_filename(apk.package)
     path = os.path.join(PACKAGE_DIR, filename + ".apk")
     shutil.move(tmp_file_path, path)
-    __store_package_info(apk.package, apk.version_name, path)
+    is_new = __store_package_info(apk.package, apk.version_name, path)
     return {
-        "package": apk.package, "version": apk.version_name
+        "package": apk.package, "version": apk.version_name, "is_new": is_new
     }

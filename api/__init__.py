@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request, abort
+from flask import Flask, jsonify, request, abort, send_file
 from werkzeug.utils import secure_filename
 from flask_sockets import Sockets
 import os
@@ -12,11 +12,9 @@ CORS(app, supports_credentials=True)
 sockets = Sockets(app)
 ALLOWED_EXTENSIONS = ["apk"]
 
-
 @app.route('/')
 def hello_world():
     return 'Hello World!'
-
 
 def allowed_file(filename):
     return '.' in filename and \
@@ -31,35 +29,28 @@ def upload_package():
     if file.filename == '' or not allowed_file(file.filename):
         return abort(404)
     pkginfo = packagestore.put(file)
+    # Broadcast to all connected sockets that we have an event
+    # { type : "update_push" }
     return jsonify({
         "success": True,
         "pkginfo": pkginfo
     })
-    # Broadcast to all connected sockets that we have an event
-    # { type : "update_push" }
 
 
 @app.route('/api/<package>/version', methods=['GET'])
 def version_check(package):
-    from pyaxmlparser import APK
-    if not packagestore.has(package):
-        return ""
-    path = packagestore.get(package)
-    apk = APK(path)
-    print(apk.package)
-    print(apk.version_name)
-    print(apk.version_code)
-    print(apk.icon_info)
-    print(apk.icon_data)
-    print(apk.application)
-    return jsonify({'version': apk.version_name})
+    pkg = packagestore.has(package)
+    if not pkg:
+        return abort(404)
+    return jsonify({'version': pkg.version})
 
 
 @app.route('/api/<package>', methods=['GET'])
 def get_package(package):
-    file = packagestore.get(package)
-    # return the file
-    return file
+    pkg = packagestore.has(package)
+    if not pkg:
+        return abort(404)
+    return send_file(pkg.file, mimetype='application/vnd.android.package-archive')
 
 
 @sockets.route('/ws')
