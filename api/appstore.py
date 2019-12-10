@@ -24,5 +24,8 @@ def notice_device_app(dev: Device, pkg, ver):
     else:
         package = pkgs[0]
         logging.warning("Adding device with existing package: " + pkg)
+        logging.warning(package)
+        package.version = ver
+
     DevicePackage.create(device=dev, package=package)
     return dev
