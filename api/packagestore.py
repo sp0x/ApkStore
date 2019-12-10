@@ -5,7 +5,9 @@ from werkzeug.utils import secure_filename
 import models
 from models import Package
 from typing import Optional
-PACKAGE_DIR = "/app/packages"
+import tempfile
+PACKAGE_DIR = os.path.join(".", "packages")
+TMPDIR = tempfile.gettempdir() # "/tmp"
 
 
 def has(pkgname) -> Optional[Package]:
@@ -55,7 +57,7 @@ def __store_package_info(pkgname, version, path):
 def put(file):
     import uuid
     unique_filename = str(uuid.uuid4())
-    tmp_file_path = "/tmp/br_" + unique_filename
+    tmp_file_path = os.path.join(TMPDIR , "br_" + unique_filename)
     file.save(tmp_file_path)
     apk = get_apkinfo(tmp_file_path)
     filename = secure_filename(apk.package)

@@ -7,7 +7,7 @@ export const apiService = {
 let API_ADDR = "/";
 if(window && window.location && window.location.href.indexOf("localhost:")!=-1){
     //Uncomment this if you're testing
-    API_ADDR = "localhost:8006/";
+    API_ADDR = "localhost:5000/";
 }
 
 //Uncomment this if you're testing
