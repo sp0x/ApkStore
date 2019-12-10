@@ -23,5 +23,8 @@ def notice_device_app(dev: Device, pkg, ver):
         package.save()
     else:
         package = pkgs[0]
-    DevicePackage.create(device=dev, package=package, version=ver)
+    existing_devpacks = DevicePackage.select().where(DevicePackage.device == dev and DevicePackage.package == package)
+    if len(existing_devpacks) == 0:
+        DevicePackage.create(device=dev, package=package, version=ver)
+
     return dev
