@@ -40,6 +40,14 @@ class App extends Component {
                     })
                 })
                 .catch(e => {
+                    this.setState({
+                        message: "Error: " + e,
+                        uploading: false
+                    }, ()=>{
+                        setTimeout(()=>{
+                            this.setState({message: null, uploading: false})
+                        }, 1000 * 10);
+                    })
                     console.log("Error ocurred!", e);
                 })
         });
