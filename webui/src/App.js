@@ -87,6 +87,14 @@ class App extends Component {
             })
     }
 
+    pushPackage = (pkgname) => {
+        apiService.get("/api/push_package/" + pkgname)
+            .then(r=>r.json())
+            .catch(e=>{
+                alert("Error occurred while pushing package: " + e)
+            })
+    };
+
     render() {
         let files = [];
         let devpacks = this.state.devpacks || [];
@@ -127,6 +135,7 @@ class App extends Component {
                                 <tr>
                                     <th>Package</th>
                                     <th>Version</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -134,6 +143,9 @@ class App extends Component {
                                 return (<tr key={i}>
                                     <td>{p.package}</td>
                                     <td>{p.version}</td>
+                                    <td>
+                                        <a onClick={this.pushPackage(p.package)}>Push</a>
+                                    </td>
                                 </tr>)
                             })}
                             </tbody>
