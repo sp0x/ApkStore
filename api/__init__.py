@@ -18,6 +18,7 @@ socketio = SocketIO(app)
 ALLOWED_EXTENSIONS = ["apk"]
 EV_PACKAGE_PUSHED = "update_push"
 EV_APP_STARTED = "appStarted"
+EV_APP_DEPLOYED = "appDeployed";
 
 
 @app.route('/')
@@ -109,6 +110,21 @@ def handle_connection(c):
 
 @socketio.on(EV_APP_STARTED)
 def handle_robot_app_start(json):
+    print('received json: ' + str(json))
+    logging.warning(json)
+    json = loads(json)
+    pkg = json["package"]
+    ver = json["version"]
+    serial = json["serial"]
+    imei = json.get("imei")
+    wifi_mac = json.get("wifi_mac")
+    ext_ip = json.get("ext_ip")
+    dev = models.Device(serial=serial, imei=imei, wifi_mac=wifi_mac, ext_ip=ext_ip)
+    appstore.notice_device_app(dev, pkg, ver)
+
+
+@socketio.on(EV_APP_DEPLOYED)
+def handle_robot_app_deployed(json):
     print('received json: ' + str(json))
     logging.warning(json)
     json = loads(json)
