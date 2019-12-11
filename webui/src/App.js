@@ -20,6 +20,7 @@ class App extends Component {
             file: null,
             message: null,
             devpacks: [],
+            packages: []
         }
     }
 
@@ -31,6 +32,7 @@ class App extends Component {
         }, () => {
             const data = new FormData();
             data.append('file', files[0]);
+
             apiService.post("/api/package", data, {
                 asForm: true
             }).then(r => r.json())
@@ -39,8 +41,8 @@ class App extends Component {
                     this.setState({
                         message: message,
                         uploading: false
-                    }, ()=>{
-                        setTimeout(()=>{
+                    }, () => {
+                        setTimeout(() => {
                             this.setState({message: null, uploading: false})
                         }, 1000 * 10);
                     })
@@ -49,8 +51,8 @@ class App extends Component {
                     this.setState({
                         message: "Error: " + e,
                         uploading: false
-                    }, ()=>{
-                        setTimeout(()=>{
+                    }, () => {
+                        setTimeout(() => {
                             this.setState({message: null, uploading: false})
                         }, 1000 * 10);
                     })
@@ -61,23 +63,35 @@ class App extends Component {
     }
 
     componentDidMount() {
-        apiService.get("/api/devices_packages")
+        apiService.get('/api/packages')
             .then(r=>r.json())
             .then(r=>{
+                this.setState({
+                    packages: r
+                })
+            })
+            .catch(e => {
+                console.log(e);
+                alert("Error occurred while fetching packages: " + e)
+            })
+        apiService.get("/api/devices_packages")
+            .then(r => r.json())
+            .then(r => {
                 this.setState({
                     devpacks: r
                 })
             })
-            .catch(e=>{
+            .catch(e => {
                 console.log(e);
                 alert("Error occurred while fetching devices and packages: " + e)
             })
     }
 
     render() {
-
         let files = [];
-        let devpacks = this.state.devpacks || []
+        let devpacks = this.state.devpacks || [];
+        let packages = this.state.packages || [];
+
         const styles = {border: '1px dashed black', width: '80%', height: '80%', color: 'white'};
         return (
             <div className="App">
@@ -93,11 +107,11 @@ class App extends Component {
                                     return (<p>
                                         Your package is uploading
                                     </p>)
-                                } else if(this.state.message){
+                                } else if (this.state.message) {
                                     return (<p>
                                         {this.state.message}
                                     </p>)
-                                }else {
+                                } else {
                                     return (<p>
                                         Drop your signed APK.
                                     </p>)
@@ -107,9 +121,26 @@ class App extends Component {
                         </FileDrop>
                     </div>
                     <Container>
+                        <h2>Packages</h2>
+                        <Table>
+                            <thead>
+                                <tr>
+                                    <th>Package</th>
+                                    <th>Version</th>
+                                </tr>
+                            </thead>
+                            <body>
+                            {packages.map((p,i)=>{
+                                return (<tr key={i}>
+                                    <td>{p.package}</td>
+                                    <td>{p.version}</td>
+                                </tr>)
+                            })}
+                            </body>
+                        </Table>
                         <h2>Devices and packages</h2>
                         <Table striped bordered hover>
-                        <thead>
+                            <thead>
                             <tr>
                                 <th>#</th>
                                 <th>Serial</th>
@@ -120,26 +151,26 @@ class App extends Component {
                                 <th>Country</th>
                                 <th>City</th>
                             </tr>
-                        </thead>
-                        <tbody>
-                        {devpacks.map((d, i)=>{
-                            let dev = d.device;
-                            let packages = d.packages;
-                            return packages.map((p, ipx)=>{
-                                return (<tr key={i + ipx}>
-                                    <td>{i + ipx}</td>
-                                    <td>{dev.serial}</td>
-                                    <td>{dev.ip}</td>
-                                    <td>{dev.mac}</td>
-                                    <td>{p.name}</td>
-                                    <td>{p.version}</td>
-                                    <td>{dev.country}</td>
-                                    <td>{dev.city}</td>
-                                </tr> )
-                            });
-                        })}
-                        </tbody>
-                    </Table>
+                            </thead>
+                            <tbody>
+                            {devpacks.map((d, i) => {
+                                let dev = d.device;
+                                let packages = d.packages;
+                                return packages.map((p, ipx) => {
+                                    return (<tr key={i + ipx}>
+                                        <td>{i + ipx}</td>
+                                        <td>{dev.serial}</td>
+                                        <td>{dev.ip}</td>
+                                        <td>{dev.mac}</td>
+                                        <td>{p.name}</td>
+                                        <td>{p.version}</td>
+                                        <td>{dev.country}</td>
+                                        <td>{dev.city}</td>
+                                    </tr>)
+                                });
+                            })}
+                            </tbody>
+                        </Table>
                     </Container>
 
                 </header>

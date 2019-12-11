@@ -80,6 +80,12 @@ def get_devpacks():
     return jsonify(devpacks)
 
 
+@app.route("/api/packages", methods=['GET'])
+def get_packages():
+    packs = packagestore.list_all()
+    return jsonify(packs)
+
+
 @socketio.on('message')
 def handle_message(message):
     print('received message: ' + message)

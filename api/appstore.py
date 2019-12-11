@@ -1,5 +1,6 @@
 from models import Package, Device, DevicePackage
 import logging
+from geolite2 import geolite2
 
 
 def notice_device_app(dev: Device, pkg, ver):
@@ -46,17 +47,32 @@ def get_all_dev_packages():
     ret = []
     devs = (Device
             .select())
+    ipreader = geolite2.reader()
     for dev in devs:
         devpacks = get_dev_packages(dev)
         if len(devpacks) == 0:
             continue
+        match = None
+        try:
+            match = ipreader.get(str(dev.ext_ip).strip())
+        except Exception as ex:
+            logging.warning(ex)
+            pass
+        country = ''
+        city = ''
+        if match is not None:
+            country = match['country']['iso_code'] if 'country' in match else ''
+            city = match['city']['names']['en'] if 'city' in match else ''
         ret.append({
             'device': {
                 'id': dev.id,
                 'serial': dev.serial,
                 'ip': dev.ext_ip,
+                'country': country,
+                'city': city,
                 'mac': dev.wifi_mac
             },
             'packages': [__format_package(x.package) for x in devpacks]
         })
+    #ipreader.close()
     return ret
