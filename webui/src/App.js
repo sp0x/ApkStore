@@ -144,7 +144,9 @@ class App extends Component {
                                     <td>{p.package}</td>
                                     <td>{p.version}</td>
                                     <td>
-                                        <a onClick={this.pushPackage(p.package)}>Push</a>
+                                        <Button onClick={()=>{
+                                            this.pushPackage(p.package)
+                                        }}>Push</Button>
                                     </td>
                                 </tr>)
                             })}

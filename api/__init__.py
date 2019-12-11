@@ -80,6 +80,17 @@ def get_devpacks():
     return jsonify(devpacks)
 
 
+@app.route("/api/push_package/<name>", methods=['GET'])
+def push_package(name):
+    pkginfo = packagestore.get_pkginfo(name)
+    if pkginfo is None:
+        return abort(404)
+    broadcast_creation(pkginfo)
+    return jsonify({
+        "success": True
+    })
+
+
 @app.route("/api/packages", methods=['GET'])
 def get_packages():
     packs = packagestore.list_all()
@@ -116,12 +127,7 @@ def handle_json(json):
     print('received json: ' + str(json))
 
 
-# ws - push update checks
-# http:
-# version check
-# package download
-# package upload
-# robot listing, just ip?
+# eventlet or gevent and gevent-websocket
 
 if __name__ == '__main__':
     # dev = models.Device(serial="ser1", imei="im1", wifi_mac="wifi_mac", ext_ip="ext_ip")

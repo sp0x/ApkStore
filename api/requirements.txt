@@ -4,3 +4,6 @@ flask-cors
 pyaxmlparser
 peewee
 maxminddb-geolite2
+eventlet
+gevent
+gevent-websocket

@@ -60,6 +60,15 @@ def __store_package_info(pkgname, version, path):
         return False
 
 
+def get_pkginfo(pkgname):
+    h = has(pkgname)
+    if h is None:
+        return None
+    return {
+        'package': h.name, 'version': h.version, 'is_new': False
+    }
+
+
 def put(file):
     import uuid
     unique_filename = str(uuid.uuid4())
