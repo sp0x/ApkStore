@@ -2,7 +2,6 @@ import os
 import logging
 import shutil
 from werkzeug.utils import secure_filename
-import models
 from models import Package
 from typing import Optional
 import tempfile

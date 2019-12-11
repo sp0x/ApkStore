@@ -1,7 +1,12 @@
 import React, {Component} from 'react';
 import FileDrop from 'react-file-drop';
+import 'bootstrap/dist/css/bootstrap.css';
+import {
+    Button, Modal, Col, Container, Dropdown, DropdownButton,
+    FormControl, InputGroup, Row, Table, Form
+} from "react-bootstrap";
+
 import {apiService} from "./apiService";
-import logo from './logo.svg';
 import './App.css';
 
 
@@ -13,7 +18,8 @@ class App extends Component {
         this.state = {
             uploading: false,
             file: null,
-            message: null
+            message: null,
+            devpacks: [],
         }
     }
 
@@ -54,9 +60,24 @@ class App extends Component {
 
     }
 
+    componentDidMount() {
+        apiService.get("/api/devices_packages")
+            .then(r=>r.json())
+            .then(r=>{
+                this.setState({
+                    devpacks: r
+                })
+            })
+            .catch(e=>{
+                console.log(e);
+                alert("Error occurred while fetching devices and packages: " + e)
+            })
+    }
+
     render() {
 
         let files = [];
+        let devpacks = this.state.devpacks || []
         const styles = {border: '1px dashed black', width: '80%', height: '80%', color: 'white'};
         return (
             <div className="App">
@@ -85,6 +106,38 @@ class App extends Component {
                             })()}
                         </FileDrop>
                     </div>
+                    <Container>
+                        <h2>Devices and packages</h2>
+                        <Table striped bordered hover>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Serial</th>
+                                <th>Ip</th>
+                                <th>Mac</th>
+                                <th>Package</th>
+                                <th>Version</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {devpacks.map((d, i)=>{
+                            let dev = d.device;
+                            let packages = d.packages;
+                            return packages.map((p, ipx)=>{
+                                return (<tr key={i + ipx}>
+                                    <td>{i + ipx}</td>
+                                    <td>{dev.serial}</td>
+                                    <td>{dev.ip}</td>
+                                    <td>{dev.mac}</td>
+                                    <td>{p.name}</td>
+                                    <td>{p.version}</td>
+                                </tr> )
+                            });
+                        })}
+                        </tbody>
+                    </Table>
+                    </Container>
+
                 </header>
             </div>
         );

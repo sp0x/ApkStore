@@ -23,8 +23,40 @@ def notice_device_app(dev: Device, pkg, ver):
         package.save()
     else:
         package = pkgs[0]
-    existing_devpacks = DevicePackage.select().where(DevicePackage.device == dev and DevicePackage.package == package)
+    existing_devpacks = DevicePackage.select().where((DevicePackage.device == dev) & (DevicePackage.package == package))
     if len(existing_devpacks) == 0:
         DevicePackage.create(device=dev, package=package, version=ver)
 
     return dev
+
+
+def get_dev_packages(dev: Device):
+    out = DevicePackage.select().where(DevicePackage.device == dev)
+    return out
+
+
+def __format_package(package: Package):
+    return {
+        'name': package.name,
+        'version': package.version
+    }
+
+
+def get_all_dev_packages():
+    ret = []
+    devs = (Device
+            .select())
+    for dev in devs:
+        devpacks = get_dev_packages(dev)
+        if len(devpacks) == 0:
+            continue
+        ret.append({
+            'device': {
+                'id': dev.id,
+                'serial': dev.serial,
+                'ip': dev.ext_ip,
+                'mac': dev.wifi_mac
+            },
+            'packages': [__format_package(x.package) for x in devpacks]
+        })
+    return ret

@@ -1,11 +1,6 @@
-import sqlite3
-from sqlite3 import Error
-# from sqlite_orm.database import Database
-# from sqlite_orm.field import IntegerField, BooleanField, TextField
-# from sqlite_orm.table import BaseTable
 from peewee import *
-
-DB = "./db/main.sqlite"
+import os
+DB = os.path.join(".", "db", "main.sqlite")
 
 db = SqliteDatabase(DB)
 db.connect()

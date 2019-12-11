@@ -74,6 +74,12 @@ def get_package(package):
     return send_file(pkg.file, mimetype='application/vnd.android.package-archive')
 
 
+@app.route("/api/devices_packages", methods=['GET'])
+def get_devpacks():
+    devpacks = appstore.get_all_dev_packages()
+    return jsonify(devpacks)
+
+
 @socketio.on('message')
 def handle_message(message):
     print('received message: ' + message)
@@ -112,6 +118,11 @@ def handle_json(json):
 # robot listing, just ip?
 
 if __name__ == '__main__':
-    dev = models.Device(serial="ser1", imei="im1", wifi_mac="wifi_mac", ext_ip="ext_ip")
+    # dev = models.Device(serial="ser1", imei="im1", wifi_mac="wifi_mac", ext_ip="ext_ip")
+    # dev2 = models.Device(serial="ser2", imei="im1", wifi_mac="wifi_mac", ext_ip="ext_ip")
+    # dev2.save()
     # appstore.notice_device_app(dev, "com.netlyt.cruzrdb", "1.1.0")
+    # appstore.notice_device_app(dev, "com.netlyt", "1.1.0")
+    # appstore.notice_device_app(dev2, "com.netlyt", "1.1.0")
+    # devpacks = appstore.get_all_dev_packages()
     socketio.run(app, host="0.0.0.0", port=5000)

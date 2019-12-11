@@ -25,3 +25,7 @@
   height: 100%;
   display: inline-block;
 }
+table{
+  font-size: 14px;
+  background-color: white;
+}
