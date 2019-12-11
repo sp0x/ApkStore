@@ -117,6 +117,8 @@ class App extends Component {
                                 <th>Mac</th>
                                 <th>Package</th>
                                 <th>Version</th>
+                                <th>Country</th>
+                                <th>City</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -131,6 +133,8 @@ class App extends Component {
                                     <td>{dev.mac}</td>
                                     <td>{p.name}</td>
                                     <td>{p.version}</td>
+                                    <td>{dev.country}</td>
+                                    <td>{dev.city}</td>
                                 </tr> )
                             });
                         })}

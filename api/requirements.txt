@@ -3,3 +3,4 @@ flask-socketio
 flask-cors
 pyaxmlparser
 peewee
+maxminddb-geolite2
