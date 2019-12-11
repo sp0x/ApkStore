@@ -122,21 +122,21 @@ class App extends Component {
                     </div>
                     <Container>
                         <h2>Packages</h2>
-                        <Table>
+                        <Table striped bordered hover>
                             <thead>
                                 <tr>
                                     <th>Package</th>
                                     <th>Version</th>
                                 </tr>
                             </thead>
-                            <body>
+                            <tbody>
                             {packages.map((p,i)=>{
                                 return (<tr key={i}>
                                     <td>{p.package}</td>
                                     <td>{p.version}</td>
                                 </tr>)
                             })}
-                            </body>
+                            </tbody>
                         </Table>
                         <h2>Devices and packages</h2>
                         <Table striped bordered hover>

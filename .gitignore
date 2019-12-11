@@ -6,3 +6,5 @@ __pycache__
 /import.csv
 *.sqlite
 *.apk
+webui/node_modules
+node_modules
