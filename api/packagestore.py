@@ -5,8 +5,9 @@ from werkzeug.utils import secure_filename
 from models import Package
 from typing import Optional
 import tempfile
+
 PACKAGE_DIR = os.path.join(".", "packages")
-TMPDIR = tempfile.gettempdir() # "/tmp"
+TMPDIR = tempfile.gettempdir()  # "/tmp"
 
 
 def has(pkgname) -> Optional[Package]:
@@ -16,7 +17,7 @@ def has(pkgname) -> Optional[Package]:
     :return: The matching package, None if not found.
     """
     matching_packages = (Package.select().where(Package.name == pkgname))
-    return None if len(matching_packages)==0 else matching_packages[0]
+    return None if len(matching_packages) == 0 else matching_packages[0]
 
 
 def get(pkgname):
@@ -62,7 +63,7 @@ def __store_package_info(pkgname, version, path):
 def put(file):
     import uuid
     unique_filename = str(uuid.uuid4())
-    tmp_file_path = os.path.join(TMPDIR , "br_" + unique_filename)
+    tmp_file_path = os.path.join(TMPDIR, "br_" + unique_filename)
     file.save(tmp_file_path)
     apk = get_apkinfo(tmp_file_path)
     filename = secure_filename(apk.package)
@@ -72,3 +73,12 @@ def put(file):
     return {
         "package": apk.package, "version": apk.version_name, "is_new": is_new
     }
+
+
+def list_all():
+    pkgs = Package.select()
+    pkgs = [{
+        'package': x.name,
+        'version': x.version
+    } for x in pkgs]
+    return pkgs
