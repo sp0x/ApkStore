@@ -18,7 +18,11 @@ socketio = SocketIO(app)
 ALLOWED_EXTENSIONS = ["apk"]
 EV_PACKAGE_PUSHED = "update_push"
 EV_APP_STARTED = "appStarted"
-EV_APP_DEPLOYED = "appDeployed";
+EV_APP_DEPLOYED = "appDeployed"
+EV_APP_DEPLOYING = "appDeploying"
+EV_APP_INSTALLED = "appInstalled"
+# Notification events
+EV_NOTIFY_DEPLOYING = "deploymentNotification"
 
 
 @app.route('/')
@@ -40,6 +44,16 @@ def broadcast_creation(pkginfo):
         "ev": ev
     }
     socketio.emit(EV_PACKAGE_PUSHED, payload, broadcast=True)
+
+
+def broadcast_deploying(dev_serial, pkginfo, version):
+    ev = ""
+    payload = {
+        "device": dev_serial,
+        "package": pkginfo["package"],
+        "version": version
+    }
+    socketio.emit(EV_NOTIFY_DEPLOYING, payload, broadcast=True)
 
 
 @app.route('/api/package', methods=['POST'])
@@ -138,6 +152,18 @@ def handle_robot_app_deployed(json):
     appstore.notice_device_app(dev, pkg, ver)
 
 
+@socketio.on(EV_APP_DEPLOYING)
+def handle_app_deploying(json):
+    json = loads(json)
+    dev_serial = json['serial']
+    pkgname = json['package']
+    version = json['version']
+    pkginfo = packagestore.get_pkginfo(pkgname)
+    if pkginfo is None:
+        return
+    broadcast_deploying(dev_serial, pkginfo, version)
+
+
 @socketio.on('json')
 def handle_json(json):
     print('received json: ' + str(json))
@@ -153,4 +179,4 @@ if __name__ == '__main__':
     # appstore.notice_device_app(dev, "com.netlyt", "1.1.0")
     # appstore.notice_device_app(dev2, "com.netlyt", "1.1.0")
     # devpacks = appstore.get_all_dev_packages()
-    socketio.run(app, host="0.0.0.0", port=5000)
+    socketio.run(app, host="0.0.0.0", port=5000, debug=True)

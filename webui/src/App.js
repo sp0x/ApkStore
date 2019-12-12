@@ -8,13 +8,16 @@ import {
 
 import {apiService} from "./apiService";
 import './App.css';
-
+import {socket} from "./socket"
 
 class App extends Component {
 
     constructor(props) {
         super(props);
         this.handleDrop = this.handleDrop.bind(this);
+        this.socket = socket({
+            onDeploying: this.appDeploying
+        });
         this.state = {
             uploading: false,
             file: null,
