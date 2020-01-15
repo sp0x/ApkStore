@@ -19,5 +19,4 @@ RUN chmod +x /entrypoint.sh
 
 ADD . .
 
-
 ENTRYPOINT ["/entrypoint.sh"]
