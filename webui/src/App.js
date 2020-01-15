@@ -162,6 +162,7 @@ class App extends Component {
                                 <th>#</th>
                                 <th>Serial</th>
                                 <th>Ip</th>
+                                <th>LanIP</th>
                                 <th>Mac</th>
                                 <th>Package</th>
                                 <th>Version</th>
@@ -178,6 +179,7 @@ class App extends Component {
                                         <td>{i + ipx}</td>
                                         <td>{dev.serial}</td>
                                         <td>{dev.ip}</td>
+                                        <td>{dev.lan_ip}</td>
                                         <td>{dev.mac}</td>
                                         <td>{p.name}</td>
                                         <td>{p.version}</td>

@@ -30,6 +30,10 @@ commands:
     desc: Pushes the service
     local: docker-compose push
 
+  migrate:
+    desc: Creates migrations if necessary
+    local: cd api; python migrations.py
+
   pre-build:
     desc: Initialize directory
     run: mkdir -p $DIR; mkdir -p $DIR/api; mkdir -p $DIR/webui
@@ -111,6 +115,7 @@ commands:
 targets:
   #The deployment target command, it runs multiple commands one after another, ensuring the previous one returned 0
   deploy:
+    - migrate
     - pre-build
     - prepare
     - push-local

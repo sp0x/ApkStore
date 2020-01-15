@@ -5,9 +5,10 @@ import os
 from flask_cors import CORS
 from json import loads
 import packagestore
-import models
+from db import *
 import logging
 import appstore
+import migrations
 
 logging.basicConfig(level=logging.WARNING)
 
@@ -23,6 +24,7 @@ EV_APP_DEPLOYING = "appDeploying"
 EV_APP_INSTALLED = "appInstalled"
 # Notification events
 EV_NOTIFY_DEPLOYING = "deploymentNotification"
+migrations.run_migrations()
 
 
 @app.route('/')
@@ -133,7 +135,8 @@ def handle_robot_app_start(json):
     imei = json.get("imei")
     wifi_mac = json.get("wifi_mac")
     ext_ip = json.get("ext_ip")
-    dev = models.Device(serial=serial, imei=imei, wifi_mac=wifi_mac, ext_ip=ext_ip)
+    lan_ip = json.get("lan_ip")
+    dev = db.device.Device(serial=serial, imei=imei, wifi_mac=wifi_mac, ext_ip=ext_ip, lan_ip=lan_ip)
     appstore.notice_device_app(dev, pkg, ver)
 
 
@@ -148,7 +151,8 @@ def handle_robot_app_deployed(json):
     imei = json.get("imei")
     wifi_mac = json.get("wifi_mac")
     ext_ip = json.get("ext_ip")
-    dev = models.Device(serial=serial, imei=imei, wifi_mac=wifi_mac, ext_ip=ext_ip)
+    lan_ip = json.get("lan_ip")
+    dev = db.device.Device(serial=serial, imei=imei, wifi_mac=wifi_mac, ext_ip=ext_ip, lan_ip=lan_ip)
     appstore.notice_device_app(dev, pkg, ver)
 
 
@@ -179,4 +183,4 @@ if __name__ == '__main__':
     # appstore.notice_device_app(dev, "com.netlyt", "1.1.0")
     # appstore.notice_device_app(dev2, "com.netlyt", "1.1.0")
     # devpacks = appstore.get_all_dev_packages()
-    socketio.run(app, host="0.0.0.0", port=5000, debug=True)
+    socketio.run(app, host="0.0.0.0", port=5000)
