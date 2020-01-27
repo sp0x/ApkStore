@@ -88,6 +88,7 @@ def list_all():
     pkgs = Package.select()
     pkgs = [{
         'package': x.name,
-        'version': x.version
+        'version': x.version,
+        'created': x.created_date,
     } for x in pkgs]
     return pkgs

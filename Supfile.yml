@@ -3,7 +3,7 @@ version: 0.4
 #The environment vars you'll use
 env:
   NAME: cruzrdeploy
-  SERVICE_NAME: ui
+  SERVICE_NAME: api
   IMAGE: netlyt/cruzrdeploy
   DIR: /var/netlyt/environments/$IMAGE
   REGISTRY: registry.netlyt.io:5000
@@ -98,7 +98,7 @@ commands:
 
   tail-logs:
     desc: Tail Docker logs
-    run: sudo docker-compose logs -f $SERVICE_NAME
+    run: sudo docker-compose logs -f --tail 10 $SERVICE_NAME
     chdir: $DIR
 
   health:

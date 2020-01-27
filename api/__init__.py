@@ -5,7 +5,10 @@ import os
 from flask_cors import CORS
 from json import loads
 import packagestore
-from db import *
+
+from models import BaseModel
+from models.device import Device
+from models.package import Package
 import logging
 import appstore
 import migrations
@@ -136,7 +139,7 @@ def handle_robot_app_start(json):
     wifi_mac = json.get("wifi_mac")
     ext_ip = json.get("ext_ip")
     lan_ip = json.get("lan_ip")
-    dev = db.device.Device(serial=serial, imei=imei, wifi_mac=wifi_mac, ext_ip=ext_ip, lan_ip=lan_ip)
+    dev = Device(serial=serial, imei=imei, wifi_mac=wifi_mac, ext_ip=ext_ip, lan_ip=lan_ip)
     appstore.notice_device_app(dev, pkg, ver)
 
 
@@ -152,7 +155,7 @@ def handle_robot_app_deployed(json):
     wifi_mac = json.get("wifi_mac")
     ext_ip = json.get("ext_ip")
     lan_ip = json.get("lan_ip")
-    dev = db.device.Device(serial=serial, imei=imei, wifi_mac=wifi_mac, ext_ip=ext_ip, lan_ip=lan_ip)
+    dev = Device(serial=serial, imei=imei, wifi_mac=wifi_mac, ext_ip=ext_ip, lan_ip=lan_ip)
     appstore.notice_device_app(dev, pkg, ver)
 
 
