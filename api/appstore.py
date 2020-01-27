@@ -1,9 +1,9 @@
 import datetime
 
-from models.device import  Device
-from models.package import  Package
+from models.device import Device
+from models.package import Package
 from models.devpackage import DevicePackage
-
+import models
 import logging
 from geolite2 import geolite2
 
@@ -46,7 +46,6 @@ def get_dev_packages(dev: Device):
 
 
 def __format_package(package: Package):
-
     return {
         'name': package.name,
         'version': package.version
@@ -75,6 +74,12 @@ def get_all_dev_packages():
             country = match['country']['iso_code'] if 'country' in match else ''
             city = match['city']['names']['en'] if 'city' in match else ''
 
+        pkgs = []
+        for x in devpacks:
+            try:
+                pkgs.append(__format_package(x.package))
+            except Package.DoesNotExist:
+                continue
         ret.append({
             'device': {
                 'id': dev.id,
@@ -83,9 +88,11 @@ def get_all_dev_packages():
                 "lan_ip": dev.lan_ip,
                 'country': country,
                 'city': city,
-                'mac': dev.wifi_mac
+                'mac': dev.wifi_mac,
+                'last_noticed': dev.last_noticed,
+                'last_updated': dev.last_updated
             },
-            'packages': [__format_package(x.package) for x in devpacks]
+            'packages': pkgs
         })
-    #ipreader.close()
+    # ipreader.close()
     return ret

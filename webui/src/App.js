@@ -168,6 +168,8 @@ class App extends Component {
                                 <th>Version</th>
                                 <th>Country</th>
                                 <th>City</th>
+                                <th>Last Noticed</th>
+                                <th>Last Updated</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -185,6 +187,8 @@ class App extends Component {
                                         <td>{p.version}</td>
                                         <td>{dev.country}</td>
                                         <td>{dev.city}</td>
+                                        <td>{dev.last_noticed}</td>
+                                        <td>{dev.last_updated}</td>
                                     </tr>)
                                 });
                             })}
