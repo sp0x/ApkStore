@@ -49,67 +49,6 @@ commands:
 #      - src: api/topics_storage
 #        dst: $DIR
 
-  pull:
-    desc: Pull latest Docker image
-    run: sudo docker-compose pull
-    chdir: $DIR
-
-  stop:
-    desc: Stop Docker container
-    run: sudo docker-compose stop $SERVICE_NAME || exit 0
-    chdir: $DIR
-
-  rm:
-    desc: Remove Docker container
-    run: sudo docker-compose rm -f $SERVICE_NAME || exit 0
-    chdir: $DIR
-
-  start:
-    desc: Start a stopped Docker container
-    run: sudo docker-compose start $SERVICE_NAME || exit 0
-    chdir: $DIR
-
-  run:
-    desc: Run Docker container
-    run: sudo docker-compose up -d $SERVICE_NAME
-    chdir: $DIR
-
-
-  restart:
-    desc: Restart Docker container
-    run: sudo docker-compose restart $SERVICE_NAME || exit 0
-    chdir: $DIR
-
-  stop-rm-run:
-    desc: Rolling update (stop & remove old Docker container, run new one)
-    run: sudo docker-compose stop $SERVICE_NAME; sudo docker-compose rm -f $SERVICE_NAME; sudo docker-compose up -d $SERVICE_NAME
-    serial: 1
-    chdir: $DIR
-
-  ps:
-    desc: List running Docker containers
-    run: sudo docker-compose ps
-    chdir: $DIR
-
-  logs:
-    desc: Docker logs
-    run: sudo docker-compose logs $SERVICE_NAME
-    chdir: $DIR
-
-  tail-logs:
-    desc: Tail Docker logs
-    run: sudo docker-compose logs -f --tail 10 $SERVICE_NAME
-    chdir: $DIR
-
-  health:
-    desc: Application health check
-    run: curl localhost:$HOST_PORT
-
-  slack-notify:
-    desc: Notify Slack about new deployment
-    local: >
-      curl -X POST --data-urlencode 'payload={"channel": "#dev", "text": "['$SUP_NETWORK'] '$SUP_USER' deployed '$NAME'"}' \
-        https://hooks.slack.com/services/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
 
 
 targets:
@@ -128,4 +67,3 @@ targets:
     - ps
     - logs
     - health
-    - slack-notify

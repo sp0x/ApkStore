@@ -23,7 +23,8 @@ def notice_device_app(dev: Device, pkg, ver):
         match.ext_ip = dev.ext_ip
         match.lan_ip = dev.lan_ip
         match.last_noticed = datetime.datetime.now()
-        match.update()
+        Device.update(imei=dev.imei, wifi_mac=dev.wifi_mac, ext_ip=dev.ext_ip, lan_ip=dev.lan_ip, last_noticed=match.last_noticed).where(id==dev.id).execute()
+        # match.update()
         dev = match
     pkgs = Package.select().where(Package.name == pkg)
     if len(pkgs) == 0:
@@ -36,6 +37,10 @@ def notice_device_app(dev: Device, pkg, ver):
     existing_devpacks = DevicePackage.select().where((DevicePackage.device == dev) & (DevicePackage.package == package))
     if len(existing_devpacks) == 0:
         DevicePackage.create(device=dev, package=package, version=ver)
+    else:
+        for dpk in existing_devpacks:
+            dpk.version = ver
+            DevicePackage.update(version=ver).where(id == dpk.id).execute()
 
     return dev
 
@@ -45,10 +50,17 @@ def get_dev_packages(dev: Device):
     return out
 
 
-def __format_package(package: Package):
+def __format_package(package: Package, version):
     return {
         'name': package.name,
-        'version': package.version
+        'version': version
+    }
+
+
+def __format_device_without_package(dev):
+    return {
+        'name': 'none',
+        'version': 0
     }
 
 
@@ -77,8 +89,9 @@ def get_all_dev_packages():
         pkgs = []
         for x in devpacks:
             try:
-                pkgs.append(__format_package(x.package))
+                pkgs.append(__format_package(x.package, x.version))
             except Package.DoesNotExist:
+                pkgs.append(__format_device_without_package(dev))
                 continue
         ret.append({
             'device': {
